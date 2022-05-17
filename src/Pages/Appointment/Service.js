@@ -2,7 +2,7 @@ import React from 'react';
 import Button from '../Shared/Button';
 
 const Service = ({ service, setTreatment }) => {
-    const { name, slots } = service;
+    const { name, slots, price } = service;
     return (
         <div className="card lg:max-w-lg bg-base-100 shadow-xl">
             <div className="card-body  text-center">
@@ -16,6 +16,9 @@ const Service = ({ service, setTreatment }) => {
 
                 </p>
                 <p className='justify-center'>{slots.length} {slots.length > 1 ? 'spaces' : 'space'}  available</p>
+
+                <p><small>price : ${price}</small></p>
+
                 <div className="card-actions justify-center">
 
                     <label
