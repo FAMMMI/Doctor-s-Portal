@@ -7,9 +7,10 @@ const CheckoutForm = ({ appointment }) => {
     const elements = useElements();
     const [cardError, setCardError] = useState('');
     const [success, setSuccess] = useState('');
+    const [processing, setProcessing] = useState(false);
     const [transactionId, setTransactionId] = useState('');
     const [clientSecret, setClientSecret] = useState("");
-    const { price, patient, patientName } = appointment
+    const { _id, price, patient, patientName } = appointment
 
     useEffect(() => {
         // Create PaymentIntent as soon as the page loads
@@ -48,6 +49,7 @@ const CheckoutForm = ({ appointment }) => {
 
         setCardError(error?.message || '');
         setSuccess('');
+        setProcessing(true);
 
         const { paymentIntent, error: intentError } = await stripe.confirmCardPayment(
             clientSecret,
@@ -64,12 +66,30 @@ const CheckoutForm = ({ appointment }) => {
 
         if (intentError) {
             setCardError(intentError?.message);
+            setProcessing(false);
         }
         else {
             setCardError('')
             console.log(paymentIntent);
             setTransactionId(paymentIntent.id);
-            setSuccess('Your payment is completed')
+            setSuccess('Your payment is completed');
+
+            const payment = {
+                appointment: _id,
+                transactionId: paymentIntent.id
+            }
+            fetch(`http://localhost:5000/booking/${_id}`, {
+                method: 'PATCH',
+                headers: {
+                    'content-type': 'application/json',
+                    'authorization': `Bearer ${localStorage.getItem('accessToken')}`
+                },
+                body: JSON.stringify(payment),
+            }).then(res => res.json())
+                .then(data => {
+                    setProcessing(false);
+                    console.log(data);
+                })
 
         }
 
@@ -93,7 +113,7 @@ const CheckoutForm = ({ appointment }) => {
                         },
                     }}
                 />
-                <button className='btn btn-transactionId btn-sm  text-white mt-4 ' type="submit" disabled={!stripe || !clientSecret}>
+                <button className='btn btn-transactionId btn-sm  text-white mt-4 ' type="submit" disabled={!stripe || !clientSecret || success}>
                     Pay
                 </button>
             </form>

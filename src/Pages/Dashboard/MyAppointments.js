@@ -50,7 +50,8 @@ const MyAppointments = () => {
                     <tbody>
                         {
                             appointments.map((a, index) =>
-                                <tr>
+
+                                <tr key={a._id}>
                                     <th>{index + 1}</th>
                                     <td>{a.patientName}</td>
                                     <td>{a.date}</td>
@@ -58,7 +59,10 @@ const MyAppointments = () => {
                                     <td>{a.treatment}</td>
                                     <td>
                                         {(a.price && !a.paid) && <Link to={`/dashboard/payment/${a._id}`}><button className='btn btn-xs btn-success text-white'>Pay</button></Link>}
-                                        {(a.price && a.paid) && <span className='text-success '>Paid</span>}
+                                        {(a.price && a.paid) && <div>
+                                            <span className='text-success '>Paid</span>
+                                            <p>Transaction ID : <span className='text-success'>{a.transactionId}</span></p>
+                                        </div>}
                                     </td>
 
                                 </tr>)
